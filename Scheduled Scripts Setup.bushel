@@ -1,0 +1,78 @@
+#!/usr/local/bin/bushelscript -l bushelscript_en
+
+--(
+	Scheduled Scripts Setup
+
+	A convenient interface to scheduling scripts to run daily using LaunchAgent plists.
+)--
+
+use AppleScript library File
+
+let reverse DNS prefix be "com.justcheesy."
+
+to make launch agent plist: label
+	label
+	#!/bin/bash
+read label
+file_path="$HOME/Library/LaunchAgents/${label}.plist"
+cat <<END > "$file_path"
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string></string>
+	<key>Program</key>
+	<string></string>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>0</integer>
+		<key>Minute</key>
+		<integer>0</integer>
+	</dict>
+</dict>
+</plist>
+END
+echo -n "$file_path"
+#!
+end make launch agent plist
+
+-- Currently unused
+to choose existing launch agent plist
+	let linefeed be ##
+
+##-- TODO: this is dumb
+
+-- TODO: Convert this to an env var		
+	reverse DNS prefix
+	#!/bin/bash
+read reverse_dns_prefix
+/bin/ls ~/Library/LaunchAgents |
+	grep "$reverse_dns_prefix"
+#!
+
+	split that by linefeed
+	choose from that
+end
+
+-- MARK: Main script
+
+let label be reverse DNS prefix & (ask "Reverse-DNS label: " & reverse DNS prefix)
+let program be ask "Full path to program:"
+let start hour be ask "Start hour in 24-hour format:" for integer
+let start minute be ask "Start minute of the hour:" for integer
+
+let file path be make launch agent plist label label
+
+tell system
+	tell property list file file path
+		define type plist item as property list item
+		set value of plist item "Label" to label
+		set value of plist item "Program" to program
+		tell plist item "StartCalendarInterval"
+			set value of plist item "Hour" to start hour
+			set value of plist item "Minute" to start minute
+		end
+	end
+end
