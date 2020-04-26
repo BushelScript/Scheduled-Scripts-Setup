@@ -6,8 +6,6 @@
 	A convenient interface to scheduling scripts to run daily using LaunchAgent plists.
 )--
 
-use AppleScript library File
-
 let reverse DNS prefix be "com.justcheesy."
 
 to make launch agent plist: label
