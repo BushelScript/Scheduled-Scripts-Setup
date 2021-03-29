@@ -1,19 +1,18 @@
 #!/usr/local/bin/bushelscript -l bushelscript_en
 
---(
-	Scheduled Scripts Setup
+-- Scheduled Scripts Setup
+-- A convenient interface to scheduling scripts to run daily
+-- using LaunchAgent plists.
 
-	A convenient interface to scheduling scripts to run daily using LaunchAgent plists.
-)--
+use AppleScript library File
+use AppleScript library Text
 
+let script name be "Scheduled Scripts Setup"
 let reverse DNS prefix be "com.justcheesy."
 
 to make launch agent plist: label
-	label
-	#!/bin/bash
-read label
-file_path="$HOME/Library/LaunchAgents/${label}.plist"
-cat <<END > "$file_path"
+	let path be (value of env var "HOME") & "/Library/LaunchAgents/" & label & ".plist"
+	let plist be ##
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -31,35 +30,46 @@ cat <<END > "$file_path"
 	</dict>
 </dict>
 </plist>
-END
-echo -n "$file_path"
-#!
-end make launch agent plist
+##
+	tell File to write to file path data plist
+	path
+end
 
 -- Currently unused
 to choose existing launch agent plist
 	let linefeed be ##
 
 ##-- TODO: this is dumb
-
--- TODO: Convert this to an env var		
-	reverse DNS prefix
+	
+	set value of env var "reverse_dns_prefix" to reverse DNS prefix
 	#!/bin/bash
-read reverse_dns_prefix
-/bin/ls ~/Library/LaunchAgents |
+/bin/ls "$HOME"/Library/LaunchAgents |
 	grep "$reverse_dns_prefix"
 #!
 
 	split that by linefeed
-	choose from that
+	choose from that prompt "Select a label:" title script name
+	if not that then return that
+	tell Text to search text that for ".plist" replacing with ""
 end
 
 -- MARK: Main script
 
-let label be reverse DNS prefix & (ask "Reverse-DNS label: " & reverse DNS prefix)
-let program be ask "Full path to program:"
-let start hour be ask "Start hour in 24-hour format:" for integer
-let start minute be ask "Start minute of the hour:" for integer
+let options be {"Select existing (to modify an agent)", "Type manually (to create or modify an agent)"}
+choose from options prompt "Select a label source:" title script name
+if not that then return
+
+if that = item 1 of options
+	choose existing launch agent plist
+else
+	reverse DNS prefix & (ask "Reverse-DNS label: " & reverse DNS prefix title script name)
+end
+if (not that ) or (that = reverse DNS prefix) then return
+let label be that
+
+let program be ask "Full path to program:" title script name
+let start hour be ask "Start hour in 24-hour format:" for integer title script name
+let start minute be ask "Start minute of the hour:" for integer title script name
 
 let file path be make launch agent plist label label
 
