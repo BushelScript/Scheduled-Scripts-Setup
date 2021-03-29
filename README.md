@@ -10,6 +10,6 @@ Scripts scheduled for daily execution can be written in any [hashbang](https://e
 
 ## Get started
 
-Scheduled Scripts Setup requires BushelScript English v0.2, which is available [here](https://github.com/BushelScript/BushelScript/releases).
+Scheduled Scripts Setup requires BushelScript English v0.3.0, which is available [here](https://github.com/BushelScript/BushelScript/releases).
 
 To run Scheduled Scripts Setup, first download [Scheduled Scripts Setup.bushel](https://github.com/BushelScript/Scheduled-Scripts-Setup/raw/master/Scheduled%20Scripts%20Setup.bushel). Then either open it in BushelScript Editor and click Run, or run `bushelscript path/to/Scheduled\ Scripts\ Setup.bushel` from a CLI shell.
